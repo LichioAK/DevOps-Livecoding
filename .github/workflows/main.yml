@@ -22,12 +22,14 @@ jobs:
 
       - name: Change directory to simple-api
         run: cd simple-api
-      - name: Build and test with SonarCloud
+
+      - name: Build and test with Maven and SonarCloud
         run: mvn -B verify sonar:sonar \
           -Dsonar.projectKey=LichioAK_DevOps-Livecoding \
           -Dsonar.organization=A.K \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
+          --file ./simple-api/pom.xml
 
 
 
