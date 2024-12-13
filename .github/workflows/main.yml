@@ -34,6 +34,10 @@ jobs:
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
+      - name: Debug Secrets
+        run:
+          echo "Docker username: ${{ secrets.DOCKERHUB_USERNAME }}"
+
       # Build and push backend image
       - name: Build image and push backend
         uses: docker/build-push-action@v3
