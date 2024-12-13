@@ -20,9 +20,6 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Change directory to simple-api
-        run: cd simple-api
-
       - name: Build and test with Maven and SonarCloud
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -31,7 +28,8 @@ jobs:
           -Dsonar.organization=A.K \
           -Dsonar.host.url=https://sonarcloud.io \
           -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          --file pom.xml
+          --file ./pom.xml
+        working-directory: ./simple-api
 
 
 
