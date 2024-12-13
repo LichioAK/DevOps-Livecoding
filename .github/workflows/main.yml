@@ -1,21 +1,57 @@
-name: CI devops 2024
+name: CI/CD Pipeline
+
 on:
-  #to begin you want to launch this job in main and develop
   push:
-    branches: #TODO
-  pull_request:
+    branches:
+      - main
 
 jobs:
+  # Job to test the backend before building Docker images
   test-backend:
     runs-on: ubuntu-22.04
     steps:
-      #checkout your github code using actions/checkout@v2.5.0
-      - uses: actions/checkout@v2.5.0
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
 
-      #do the same with another action (actions/setup-java@v3) that enable to setup jdk 17
       - name: Set up JDK 17
-        #TODO
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
 
-      #finally build your app with the latest command
       - name: Build and test with Maven
-        run: #TODO
+        run: mvn clean verify --file ./simple-api/pom.xml
+
+  # Job to build and push Docker images after successful tests
+  build-and-push-docker-image:
+    needs: test-backend  # This ensures the Docker images are built only after tests pass
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.5.0
+
+      - name: Login to DockerHub
+        run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Build and push backend image
+      - name: Build image and push backend
+        uses: docker/build-push-action@v3
+        with:
+          context: ./simple-api
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:backend-latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      # Build and push database image (Example for PostgreSQL)
+      - name: Build image and push database
+        uses: docker/build-push-action@v3
+        with:
+          context: ./database  # Assuming you have a Dockerfile in the database folder
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:database-latest
+          push: ${{ github.ref == 'refs/heads/main' }}
+
+      # Build and push httpd image (Example for HTTP server)
+      - name: Build image and push httpd
+        uses: docker/build-push-action@v3
+        with:
+          context: ./httpd  # Assuming you have a Dockerfile in the httpd folder
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:httpd-latest
+          push: ${{ github.ref == 'refs/heads/main' }}
