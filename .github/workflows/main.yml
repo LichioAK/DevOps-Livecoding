@@ -23,9 +23,9 @@ jobs:
       - name: Build and test with Maven
         run: mvn clean verify --file ./simple-api/pom.xml
 
-  # Job to build and push Docker images after successful tests
+  # Job to build and push Docker images after tests
   build-and-push-docker-image:
-    needs: test-backend  # This ensures the Docker images are built only after tests pass
+    needs: test-backend
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout code
@@ -45,18 +45,18 @@ jobs:
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:backend-latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      # Build and push database image (Example for PostgreSQL)
+      # Build and push database image
       - name: Build image and push database
         uses: docker/build-push-action@v3
         with:
-          context: ./database  # Assuming you have a Dockerfile in the database folder
+          context: ./database
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:database-latest
           push: ${{ github.ref == 'refs/heads/main' }}
 
-      # Build and push httpd image (Example for HTTP server)
-      - name: Build image and push httpd
+      # Build and push httpd image
+      - name: Build and push httpd image
         uses: docker/build-push-action@v3
         with:
-          context: ./httpd  # Assuming you have a Dockerfile in the httpd folder
+          context: ./http-server
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cicd_pipeline:httpd-latest
           push: ${{ github.ref == 'refs/heads/main' }}
