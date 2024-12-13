@@ -20,13 +20,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build and test with Maven
-        run: mvn -B -X verify sonar:sonar \
+      - name: Change directory to simple-api
+        run: cd simple-api
+      - name: Build and test with SonarCloud
+        run: mvn -B verify sonar:sonar \
           -Dsonar.projectKey=LichioAK_DevOps-Livecoding \
           -Dsonar.organization=A.K \
           -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
-          --file ./simple-api/pom.xml
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
 
 
 
